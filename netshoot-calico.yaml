@@ -1,0 +1,46 @@
+apiVersion: apps/v1beta2 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  namespace: kube-system
+  name: netshoot-calico-deploy
+  labels:
+    app: netshoot-calico
+spec:
+  selector:
+    matchLabels:
+      app: netshoot
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: netshoot
+    spec:
+      serviceAccount: calico-node
+      serviceAccountName: calico-node
+      hostNetwork: true
+      containers:
+      - image: nicolaka/netshoot
+        name: netshoot
+        securityContext:
+          allowPrivilegeEscalation: true
+        command: ["ping","localhost"]
+        volumeMounts:
+        - mountPath: /var/run/calico/bird.ctl
+          name: bird-ctl
+        - mountPath: /kube
+          name: kubeconfig
+        env:
+        - name: DATASTORE_TYPE
+          value: "kubernetes"
+        - name: KUBECONFIG
+          value: "/kube/config"
+      volumes:
+        - name: bird-ctl
+          hostPath:
+            path: /var/run/calico/bird.ctl
+        - name: kubeconfig
+          hostPath:
+            path: /home/vagrant/.kube
+      nodeSelector:
+        kubernetes.io/hostname: k8s-node-1
