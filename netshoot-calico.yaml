@@ -24,6 +24,8 @@ spec:
         name: netshoot
         securityContext:
           allowPrivilegeEscalation: true
+          capabilities:
+            add: ["NET_ADMIN", "SYS_TIME", "SYS_ADMIN"]
         command: ["ping","localhost"]
         volumeMounts:
         - mountPath: /var/run/calico/bird.ctl
