@@ -32,6 +32,8 @@ spec:
           name: bird-ctl
         - mountPath: /kube
           name: kubeconfig
+        - mountPath: /var/run/docker.sock
+          name: docker-sock
         env:
         - name: DATASTORE_TYPE
           value: "kubernetes"
@@ -44,5 +46,8 @@ spec:
         - name: kubeconfig
           hostPath:
             path: /home/vagrant/.kube
+        - name: docker-sock
+          hostPath:
+            path: /var/run/docker.sock
       nodeSelector:
         kubernetes.io/hostname: k8s-node-1
